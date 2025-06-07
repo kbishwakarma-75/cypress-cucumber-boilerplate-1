@@ -1,22 +1,32 @@
 const { defineConfig } = require("cypress");
+const path = require("path");
+const fs = require("fs");
 const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
 const preprocessor = require("@badeball/cypress-cucumber-preprocessor");
 const createEsbuildPlugin = require("@badeball/cypress-cucumber-preprocessor/esbuild");
-const allureWriter = require("@shelex/cypress-allure-plugin/writer");
+
 
 async function setupNodeEvents(on, config) {
-  // This is required for the preprocessor to be able to generate JSON reports after each run, and more,
+  // Add Cucumber preprocessor plugin
   await preprocessor.addCucumberPreprocessorPlugin(on, config);
 
+  // Use esbuild for preprocessing
   on(
     "file:preprocessor",
     createBundler({
       plugins: [createEsbuildPlugin.default(config)],
     })
   );
-  allureWriter(on, config);
 
-  // Make sure to return the config object as it might have been modified by the plugin.
+  // Generate Cucumber JSON after run
+  on("after:run", () => {
+    const reportsDir = "cucumber-json";
+    if (!fs.existsSync(reportsDir)) {
+      fs.mkdirSync(reportsDir);
+    }
+  });
+
+  // Return the updated config
   return config;
 }
 
