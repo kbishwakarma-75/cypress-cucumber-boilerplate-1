@@ -1,12 +1,14 @@
 /// <reference types="cypress" />
 import { Given, When, Then, } from "@badeball/cypress-cucumber-preprocessor";
-import { loginPage } from '@pages/LoginPage.page'
+import LoginPage from '../../pagesObjects/LoginPage.page';
+const loginPage = new LoginPage;
 
+// cypress\pages\LoginPage.page.ts
 Given("A web browser is at the saucelabs login page", () => {
   cy.visit("/");
 });
 
-When("A user enters the username {string}, the password {string}, and clicks on the login button", (username, password) => {
+When("A user enters the username {string}, the password {string}, and clicks on the login button", (username: string, password: string) => {
   loginPage.submitLogin(username, password)
 
 });
